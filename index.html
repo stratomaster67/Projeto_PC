@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Manager Pro</title>
+    <style>
+        :root {
+            --bg-color: #0f111a;
+            --surface-color: #1e212b;
+            --surface-hover: #272a35;
+            --primary-color: #00ffcc;
+            --danger-color: #ff4757;
+            --warning-color: #ffa502;
+            --text-main: #f1f2f6;
+            --text-muted: #a4b0be;
+            --border-radius: 8px;
+            --transition: all 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        /* Presets Section */
+        .presets-container {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-preset {
+            background: var(--surface-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .btn-preset:hover {
+            border-color: var(--primary-color);
+            background: var(--surface-hover);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .card h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card p {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 0.5rem;
+        }
+
+        .card input[type="number"] {
+            background: var(--bg-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 0.25rem;
+            border-radius: 4px;
+            width: 80%;
+            margin-top: 0.5rem;
+        }
+
+        /* Budget Progress Bar */
+        .budget-container {
+            background: var(--surface-color);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .budget-txt {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-bg {
+            background: var(--bg-color);
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-color);
+            transition: width 0.4s ease, background-color 0.3s ease;
+        }
+
+        .progress-bar-fill.danger {
+            background: var(--danger-color);
+        }
+
+        /* Compatibility Alert */
+        .alert-box {
+            background: rgba(255, 165, 2, 0.1);
+            border: 1px solid var(--warning-color);
+            color: var(--warning-color);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-section {
+            background: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .autocomplete-wrapper {
+            position: relative;
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--surface-hover);
+            border: 1px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            list-style: none;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            margin-top: 4px;
+        }
+
+        .suggestions li {
+            padding: 0.75rem;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+        }
+
+        .suggestions li:last-child {
+            border-bottom: none;
+        }
+
+        .suggestions li:hover {
+            background: var(--bg-color);
+            color: var(--primary-color);
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        input, select {
+            background: var(--bg-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            padding: 0.75rem;
+            border-radius: calc(var(--border-radius) / 2);
+            outline: none;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+        }
+
+        button.btn-add {
+            grid-column: 1 / -1;
+            background: var(--primary-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 1rem;
+            font-weight: bold;
+            border-radius: calc(var(--border-radius) / 2);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 0.5rem;
+        }
+
+        button.btn-add:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Action Bar for Portability */
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: calc(var(--border-radius) / 2);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .btn-action:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .component-list {
+            list-style: none;
+        }
+
+        .component-item {
+            background: var(--surface-color);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .component-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .component-info h4 {
+            margin-bottom: 0.2rem;
+        }
+
+        .component-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-delete {
+            background: transparent;
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-delete:hover {
+            background: var(--danger-color);
+            color: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .component-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .btn-delete {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Setup Manager Pro</h1>
+            <p>Arquitete e gerencie o hardware do seu PC</p>
+        </header>
+
+        <div class="presets-container">
+            <button class="btn-preset" onclick="loadPreset('entrada')">⚡ Build Entrada</button>
+            <button class="btn-preset" onclick="loadPreset('intermediario')">🎮 Gamer Intermediário</button>
+            <button class="btn-preset" onclick="loadPreset('entusiasta')">🔥 High-End Entusiasta</button>
+        </div>
+
+        <section class="dashboard">
+            <div class="card">
+                <h3>Consumo Estimado</h3>
+                <p id="totalWatts">0 W</p>
+            </div>
+            <div class="card">
+                <h3>Custo Total</h3>
+                <p id="totalPrice">R$ 0,00</p>
+            </div>
+            <div class="card">
+                <h3>Orçamento Alvo</h3>
+                <input type="number" id="budgetCap" min="0" value="7000" step="100">
+            </div>
+        </section>
+
+        <section class="budget-container">
+            <div class="budget-txt">
+                <span id="budgetStatus">Progresso do Orçamento: 0%</span>
+                <span id="budgetMessage"></span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="progressBar" class="progress-bar-fill"></div>
+            </div>
+        </section>
+
+        <div id="compatAlert" class="alert-box"></div>
+
+        <section class="form-section">
+            <form id="setupForm">
+                <div class="input-group autocomplete-wrapper">
+                    <label for="name">Componente</label>
+                    <input type="text" id="name" placeholder="Digite para buscar (ex: Ryzen, RTX...)" required autocomplete="off">
+                    <ul id="suggestions" class="suggestions"></ul>
+                </div>
+                <div class="input-group">
+                    <label for="category">Categoria</label>
+                    <select id="category" required>
+                        <option value="GPU">Placa de Vídeo (GPU)</option>
+                        <option value="CPU">Processador (CPU)</option>
+                        <option value="PSU">Fonte de Alimentação</option>
+                        <option value="MOBO">Placa-Mãe</option>
+                        <option value="RAM">Memória RAM</option>
+                        <option value="STORAGE">Armazenamento</option>
+                        <option value="COOLER">Refrigeração</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="watts">Consumo (Watts)</label>
+                    <input type="number" id="watts" min="0" placeholder="Ex: 65" required>
+                </div>
+                <div class="input-group">
+                    <label for="price">Preço (R$)</label>
+                    <input type="number" id="price" min="0" step="0.01" placeholder="Ex: 1500.00" required>
+                </div>
+                <button type="submit" class="btn-add">Adicionar ao Setup</button>
+            </form>
+        </section>
+
+        <div class="action-bar">
+            <button class="btn-action" onclick="exportSetup()">📤 Exportar Setup</button>
+            <button class="btn-action" onclick="importSetup()">📥 Importar Setup</button>
+        </div>
+
+        <ul class="component-list" id="componentList"></ul>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'setup_manager_data';
+        const BUDGET_KEY = 'setup_manager_budget';
+
+        let hardwareDB = []; 
+        let components = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        let budgetTarget = Number(localStorage.getItem(BUDGET_KEY)) || 7000;
+
+        // DOM Elements
+        const form = document.getElementById('setupForm');
+        const listContainer = document.getElementById('componentList');
+        const totalWattsEl = document.getElementById('totalWatts');
+        const totalPriceEl = document.getElementById('totalPrice');
+        const budgetInput = document.getElementById('budgetCap');
+        const progressBar = document.getElementById('progressBar');
+        const budgetStatus = document.getElementById('budgetStatus');
+        const budgetMessage = document.getElementById('budgetMessage');
+        const compatAlert = document.getElementById('compatAlert');
+        
+        const nameInput = document.getElementById('name');
+        const suggestionsBox = document.getElementById('suggestions');
+        const categoryInput = document.getElementById('category');
+        const wattsInput = document.getElementById('watts');
+        const priceInput = document.getElementById('price');
+
+        // Configuração inicial do input de orçamento
+        budgetInput.value = budgetTarget;
+
+        // Templates de Presets Prontos
+        const presets = {
+            entrada: [
+                { id: crypto.randomUUID(), name: 'AMD Ryzen 5 5600', category: 'CPU', watts: 65, price: 850, createdAt: Date.now() },
+                { id: crypto.randomUUID(), name: 'NVIDIA RTX 4060 Ti', category: 'GPU', watts: 160, price: 2400, createdAt: Date.now() + 1 },
+                { id: crypto.randomUUID(), name: 'MSI B550M PRO-VDH WiFi', category: 'MOBO', watts: 35, price: 700, createdAt: Date.now() + 2 },
+                { id: crypto.randomUUID(), name: 'Kingston Fury Beast 16GB DDR4', category: 'RAM', watts: 5, price: 320, createdAt: Date.now() + 3 },
+                { id: crypto.randomUUID(), name: 'SSD Kingston NV2 1TB M.2', category: 'STORAGE', watts: 4, price: 390, createdAt: Date.now() + 4 }
+            ],
+            intermediario: [
+                { id: crypto.randomUUID(), name: 'AMD Ryzen 7 5700X', category: 'CPU', watts: 65, price: 1250, createdAt: Date.now() },
+                { id: crypto.randomUUID(), name: 'NVIDIA RTX 4070 Super', category: 'GPU', watts: 220, price: 3900, createdAt: Date.now() + 1 },
+                { id: crypto.randomUUID(), name: 'MSI B550M PRO-VDH WiFi', category: 'MOBO', watts: 35, price: 700, createdAt: Date.now() + 2 },
+                { id: crypto.randomUUID(), name: 'Corsair Vengeance 32GB DDR5', category: 'RAM', watts: 7, price: 890, createdAt: Date.now() + 3 },
+                { id: crypto.randomUUID(), name: 'SSD Kingston NV2 1TB M.2', category: 'STORAGE', watts: 4, price: 390, createdAt: Date.now() + 4 }
+            ],
+            entusiasta: [
+                { id: crypto.randomUUID(), name: 'AMD Ryzen 7 7800X3D', category: 'CPU', watts: 120, price: 2700, createdAt: Date.now() },
+                { id: crypto.randomUUID(), name: 'Gigabyte RTX 5070 Eagle', category: 'GPU', watts: 250, price: 4500, createdAt: Date.now() + 1 },
+                { id: crypto.randomUUID(), name: 'Corsair Vengeance 32GB DDR5', category: 'RAM', watts: 7, price: 890, createdAt: Date.now() + 2 },
+                { id: crypto.randomUUID(), name: 'SSD Kingston NV2 1TB M.2', category: 'STORAGE', watts: 4, price: 390, createdAt: Date.now() + 3 }
+            ]
+        };
+
+        async function loadHardwareDatabase() {
+            try {
+                const response = await fetch('./hardware.json'); 
+                if (!response.ok) throw new Error('Arquivo não encontrado');
+                hardwareDB = await response.json();
+            } catch (error) {
+                hardwareDB = [
+                    { name: 'AMD Ryzen 7 7800X3D', category: 'CPU', watts: 120, price: 2700 },
+                    { name: 'AMD Ryzen 7 5700X', category: 'CPU', watts: 65, price: 1250 },
+                    { name: 'AMD Ryzen 5 5600', category: 'CPU', watts: 65, price: 850 },
+                    { name: 'Intel Core i5-14600K', category: 'CPU', watts: 125, price: 1950 },
+                    { name: 'Intel Core i7-14700K', category: 'CPU', watts: 125, price: 2800 },
+                    { name: 'Gigabyte RTX 5070 Eagle', category: 'GPU', watts: 250, price: 4500 },
+                    { name: 'NVIDIA RTX 4070 Super', category: 'GPU', watts: 220, price: 3900 },
+                    { name: 'NVIDIA RTX 4060 Ti', category: 'GPU', watts: 160, price: 2400 },
+                    { name: 'Cooler Master 850W 80 Plus Gold', category: 'PSU', watts: 0, price: 850 },
+                    { name: 'Corsair CX650 650W', category: 'PSU', watts: 0, price: 380 },
+                    { name: 'Kingston Fury Beast 16GB DDR4', category: 'RAM', watts: 5, price: 320 },
+                    { name: 'Corsair Vengeance 32GB DDR5', category: 'RAM', watts: 7, price: 890 },
+                    { name: 'SSD Kingston NV2 1TB M.2 NVMe', category: 'STORAGE', watts: 4, price: 390 }
+                ];
+            }
+        }
+
+        // Auto-completar
+        nameInput.addEventListener('input', () => {
+            const query = nameInput.value.toLowerCase();
+            suggestionsBox.innerHTML = '';
+            if (!query) { suggestionsBox.style.display = 'none'; return; }
+
+            const matches = hardwareDB.filter(item => item.name.toLowerCase().includes(query));
+
+            if (matches.length > 0) {
+                suggestionsBox.style.display = 'block';
+                matches.forEach(match => {
+                    const li = document.createElement('li');
+                    li.textContent = match.name;
+                    li.addEventListener('click', () => {
+                        nameInput.value = match.name;
+                        categoryInput.value = match.category;
+                        wattsInput.value = match.watts;
+                        priceInput.value = match.price;
+                        suggestionsBox.style.display = 'none';
+                    });
+                    suggestionsBox.appendChild(li);
+                });
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target !== nameInput && e.target !== suggestionsBox) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        // Escuta alteração do Orçamento Máximo
+        budgetInput.addEventListener('input', () => {
+            budgetTarget = Number(budgetInput.value) || 0;
+            localStorage.setItem(BUDGET_KEY, budgetTarget);
+            updateDashboard();
+        });
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(components));
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        }
+
+        // Dashboard & Inteligência de Validação de Orçamento e Fonte
+        function updateDashboard() {
+            const totals = components.reduce((acc, curr) => {
+                acc.watts += Number(curr.watts);
+                acc.price += Number(curr.price);
+                if(curr.category === 'GPU' && (curr.name.includes('40') || curr.name.includes('50'))) {
+                    acc.hasHighEndGPU = true;
+                }
+                return acc;
+            }, { watts: 0, price: 0, hasHighEndGPU: false });
+
+            totalWattsEl.textContent = `${totals.watts} W`;
+            totalPriceEl.textContent = formatCurrency(totals.price);
+
+            // 1. Regra de Negócio: Gestão do Orçamento Alvo
+            if (budgetTarget > 0) {
+                const percent = Math.min((totals.price / budgetTarget) * 100, 100);
+                progressBar.style.width = `${percent}%`;
+                budgetStatus.textContent = `Progresso do Orçamento: ${Math.round((totals.price / budgetTarget) * 100)}%`;
+
+                if (totals.price > budgetTarget) {
+                    progressBar.classList.add('danger');
+                    const overflow = totals.price - budgetTarget;
+                    budgetMessage.textContent = `Orçamento estourado em ${formatCurrency(overflow)}!`;
+                    budgetMessage.style.color = 'var(--danger-color)';
+                } else {
+                    progressBar.classList.remove('danger');
+                    budgetMessage.textContent = `Disponível: ${formatCurrency(budgetTarget - totals.price)}`;
+                    budgetMessage.style.color = 'var(--primary-color)';
+                }
+            } else {
+                progressBar.style.width = '0%';
+                budgetStatus.textContent = 'Defina um orçamento alvo';
+                budgetMessage.textContent = '';
+            }
+
+            // 3. Regra de Negócio: Alerta Dinâmico de Compatibilidade Elétrica
+            if (totals.hasHighEndGPU && totals.watts > 350) {
+                compatAlert.innerHTML = `⚠️ <strong>Alerta de Compatibilidade:</strong> Você adicionou uma GPU de alta performance com consumo elevado de energia. Garanta que sua fonte seja de pelo menos <strong>750W ou 850W 80 Plus Gold</strong> para manter este setup estável sob carga total.`;
+                compatAlert.style.display = 'block';
+            } else {
+                compatAlert.style.display = 'none';
+            }
+        }
+
+        function renderList() {
+            listContainer.innerHTML = '';
+            components
+                .sort((a, b) => b.createdAt - a.createdAt)
+                .forEach(comp => {
+                    const li = document.createElement('li');
+                    li.className = 'component-item';
+                    li.innerHTML = `
+                        <div class="component-info">
+                            <h4>${comp.name}</h4>
+                            <div class="component-meta">
+                                <span>[${comp.category}]</span>
+                                <span>${comp.watts} W</span>
+                                <span>${formatCurrency(comp.price)}</span>
+                            </div>
+                        </div>
+                        <button class="btn-delete" onclick="deleteComponent('${comp.id}')">Remover</button>
+                    `;
+                    listContainer.appendChild(li);
+                });
+            updateDashboard();
+        }
+
+        window.deleteComponent = function(id) {
+            components = components.filter(c => c.id !== id);
+            saveData();
+            renderList();
+        }
+
+        // 4. Regra de Negócio: Presets Rápidos (Injeção de Estado Mocado)
+        window.loadPreset = function(type) {
+            if (components.length > 0 && !confirm('Deseja sobrescrever o seu setup atual com este preset?')) {
+                return;
+            }
+            // Clona profundamente os objetos do preset gerando novos IDs estáveis
+            components = presets[type].map(item => ({ ...item, id: crypto.randomUUID(), createdAt: Date.now() }));
+            saveData();
+            renderList();
+        }
+
+        // 2. Regra de Negócio: Exportar/Importar via serialização Base64 (Portabilidade sem Backend)
+        window.exportSetup = function() {
+            if (components.length === 0) {
+                alert('Adicione componentes antes de exportar.');
+                return;
+            }
+            try {
+                const jsonStr = JSON.stringify(components);
+                const b64Code = btoa(encodeURIComponent(jsonStr));
+                
+                // Exibe prompt nativo permitindo cópia rápida pelo usuário
+                prompt('Copia o código abaixo e envie para compartilhar o seu setup:', b64Code);
+            } catch (err) {
+                alert('Erro interno ao codificar dados da build.');
+            }
+        }
+
+        window.importSetup = function() {
+            const code = prompt('Cole o código do setup exportado aqui:');
+            if (!code) return;
+            try {
+                const decodedJson = decodeURIComponent(atob(code.trim()));
+                const parsedArray = JSON.parse(decodedJson);
+                
+                if (Array.isArray(parsedArray)) {
+                    components = parsedArray;
+                    saveData();
+                    renderList();
+                    alert('Setup importado com sucesso!');
+                } else {
+                    throw new Error();
+                }
+            } catch (err) {
+                alert('Código de compartilhamento inválido ou corrompido.');
+            }
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = nameInput.value.trim();
+            const category = categoryInput.value;
+            const watts = wattsInput.value;
+            const price = priceInput.value;
+
+            if (!name || watts < 0 || price < 0) {
+                alert('Por favor, preencha os campos com valores válidos.');
+                return;
+            }
+
+            components.push({
+                id: crypto.randomUUID(),
+                name,
+                category,
+                watts: Number(watts),
+                price: Number(price),
+                createdAt: Date.now()
+            });
+
+            saveData();
+            renderList();
+            form.reset();
+            nameInput.focus();
+        });
+
+        async function init() {
+            renderList();
+            await loadHardwareDatabase();
+        }
+
+        init();
+    </script>
+</body>
+</html>
