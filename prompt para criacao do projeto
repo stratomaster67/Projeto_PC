@@ -1,0 +1,56 @@
+Atue como um Engenheiro de Software Sênior e Arquiteto de Sistemas especialista na metodologia SDD (Spec Driven Development) e no fluxo Spec Kit.
+
+Seu objetivo é transformar uma necessidade real em uma aplicação funcional do zero, gerando de forma sequencial toda a documentação arquitetural e o código de implementação de nível de produção.
+
+Tema do Sistema: [Insira o tema aqui, ex: Sistema de Gerenciamento de Setup de PC e Hardware]
+
+Contexto: O sistema deve resolver um problema real, ser leve, funcional e pronto para deploy imediato no GitHub Pages.
+
+Você deve executar o fluxo estrito do Spec Kit e gerar os seguintes artefatos em arquivos Markdown separados:
+
+FASE 1: CONSTITUIÇÃO (constitution.md)
+
+Defina as regras rígidas de tecnologia, restrições arquiteturais e boas práticas que guiarão o projeto.
+
+- Stack principal (recomende HTML5, CSS3 moderno com variáveis, JavaScript Vanilla).
+
+- Estratégia de persistência de dados (ex: LocalStorage para viabilizar deploy estático).
+
+- Padrão de design e guia de estilo de código.
+
+FASE 2: SPECIFY (schema.md)
+
+Analise o problema real e defina a especificação técnica dos dados.
+
+- Mapeie pelo menos 3 Requisitos Funcionais (RF) cruciais para o funcionamento.
+
+- Desenhe o Schema de Dados completo (Entidades, Atributos, Tipos de Dados e chaves primárias/timestamps).
+
+FASE 3: PLAN (plan.md)
+
+Desenhe a arquitetura do sistema cruzando os dados com a experiência do usuário.
+
+- Mapeie pelo menos 2 Requisitos Não Funcionais (RNF) (ex: Desempenho, Responsividade, Persistência local estável).
+
+- Descreva o fluxo de arquitetura da aplicação (como os dados fluem da interface para o armazenamento).
+
+FASE 4: TASKS (roadmap.md)
+
+Gere um plano de ação ordenado (Roadmap de Implementação) dividido em etapas lógicas, utilizando checklists markdown ([x] ou [ ]), mostrando o passo a passo exato do desenvolvimento até o deploy.
+
+FASE 5: IMPLEMENT (Código Fonte)
+
+Gere o código final de produção unificado ou estruturado de forma limpa. O código deve ser:
+
+1. Extremamente visual e moderno (design responsivo, dark mode elegante, espaçamentos bem definidos).
+
+2. Funcional: com tratamento de erros simples (validação de campos vazios).
+
+3. Auto-contido: Se for usar um arquivo único (index.html), garanta que as tags <style> e <script> estejam perfeitamente organizadas e comentadas.
+
+Regras de Saída:
+
+- Separe claramente cada arquivo usando blocos de código Markdown apropriados para que eu possa apenas copiar e colar.
+
+- Seja técnico, direto e evite introduções longas. Vá direto ao fluxo SDD. 
+
