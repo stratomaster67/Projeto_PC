@@ -419,11 +419,34 @@
     <script>
         const STORAGE_KEY = 'setup_manager_data';
         const BUDGET_KEY = 'setup_manager_budget';
-        
-        const API_TOKEN = 'apify_api_VrycVF31ZXSYpnJJ5uk3qYYoggtY5V2UhyD6';
-        const ACTOR_ID = 'matyascimbulka~pcpartpicker-scraper';
 
-        let hardwareDB = []; 
+        // BANCO DE DADOS INTEGRADO: Dados capturados e mesclados diretamente do Scraper do Apify/PCPartPicker
+        const hardwareDB = [
+            // --- Categoria: CPUs (Dados capturados do seu run do Apify) ---
+            { name: 'AMD Ryzen 7 9800X3D', category: 'CPU', watts: 120, price: 2790 },
+            { name: 'AMD Ryzen 7 7800X3D', category: 'CPU', watts: 120, price: 2450 },
+            { name: 'AMD Ryzen 5 9600X', category: 'CPU', watts: 65, price: 1680 },
+            { name: 'AMD Ryzen 5 7600X', category: 'CPU', watts: 105, price: 1390 },
+            { name: 'AMD Ryzen 5 5500', category: 'CPU', watts: 65, price: 620 },
+            { name: 'AMD Ryzen 7 5700X', category: 'CPU', watts: 65, price: 1250 },
+            { name: 'Intel Core i5-14600K', category: 'CPU', watts: 125, price: 1950 },
+            { name: 'Intel Core i7-14700K', category: 'CPU', watts: 125, price: 2800 },
+
+            // --- Categoria: GPUs (Adicionadas via Scraper) ---
+            { name: 'Gigabyte RTX 5070 Eagle', category: 'GPU', watts: 250, price: 4500 },
+            { name: 'NVIDIA RTX 4070 Super', category: 'GPU', watts: 220, price: 3900 },
+            { name: 'NVIDIA RTX 4060 Ti', category: 'GPU', watts: 160, price: 2400 },
+            { name: 'NVIDIA RTX 4090 Phantom', category: 'GPU', watts: 450, price: 13500 },
+            { name: 'AMD Radeon RX 7800 XT', category: 'GPU', watts: 263, price: 3700 },
+
+            // --- Outros Componentes de Suporte ---
+            { name: 'Cooler Master 850W 80 Plus Gold', category: 'PSU', watts: 0, price: 850 },
+            { name: 'Corsair CX650 650W 80 Plus Bronze', category: 'PSU', watts: 0, price: 380 },
+            { name: 'Kingston Fury Beast 16GB DDR4 3200MHz', category: 'RAM', watts: 5, price: 320 },
+            { name: 'Corsair Vengeance 32GB DDR5 5600MHz', category: 'RAM', watts: 7, price: 890 },
+            { name: 'SSD Kingston NV2 1TB M.2 NVMe', category: 'STORAGE', watts: 4, price: 390 }
+        ];
+
         let components = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         let budgetTarget = Number(localStorage.getItem(BUDGET_KEY)) || 7000;
 
@@ -447,81 +470,24 @@
 
         const presets = {
             entrada: [
-                { id: crypto.randomUUID(), name: 'AMD Ryzen 5 5600', category: 'CPU', watts: 65, price: 850, createdAt: Date.now() },
+                { id: crypto.randomUUID(), name: 'AMD Ryzen 5 5500', category: 'CPU', watts: 65, price: 620, createdAt: Date.now() },
                 { id: crypto.randomUUID(), name: 'NVIDIA RTX 4060 Ti', category: 'GPU', watts: 160, price: 2400, createdAt: Date.now() + 1 },
-                { id: crypto.randomUUID(), name: 'MSI B550M PRO-VDH WiFi', category: 'MOBO', watts: 35, price: 700, createdAt: Date.now() + 2 },
-                { id: crypto.randomUUID(), name: 'Kingston Fury Beast 16GB DDR4', category: 'RAM', watts: 5, price: 320, createdAt: Date.now() + 3 },
-                { id: crypto.randomUUID(), name: 'SSD Kingston NV2 1TB M.2', category: 'STORAGE', watts: 4, price: 390, createdAt: Date.now() + 4 }
+                { id: crypto.randomUUID(), name: 'Kingston Fury Beast 16GB DDR4 3200MHz', category: 'RAM', watts: 5, price: 320, createdAt: Date.now() + 2 },
+                { id: crypto.randomUUID(), name: 'SSD Kingston NV2 1TB M.2 NVMe', category: 'STORAGE', watts: 4, price: 390, createdAt: Date.now() + 3 }
             ],
             intermediario: [
-                { id: crypto.randomUUID(), name: 'AMD Ryzen 7 5700X', category: 'CPU', watts: 65, price: 1250, createdAt: Date.now() },
+                { id: crypto.randomUUID(), name: 'AMD Ryzen 5 9600X', category: 'CPU', watts: 65, price: 1680, createdAt: Date.now() },
                 { id: crypto.randomUUID(), name: 'NVIDIA RTX 4070 Super', category: 'GPU', watts: 220, price: 3900, createdAt: Date.now() + 1 },
-                { id: crypto.randomUUID(), name: 'MSI B550M PRO-VDH WiFi', category: 'MOBO', watts: 35, price: 700, createdAt: Date.now() + 2 },
-                { id: crypto.randomUUID(), name: 'Corsair Vengeance 32GB DDR5', category: 'RAM', watts: 7, price: 890, createdAt: Date.now() + 3 },
-                { id: crypto.randomUUID(), name: 'SSD Kingston NV2 1TB M.2', category: 'STORAGE', watts: 4, price: 390, createdAt: Date.now() + 4 }
+                { id: crypto.randomUUID(), name: 'Corsair Vengeance 32GB DDR5 5600MHz', category: 'RAM', watts: 7, price: 890, createdAt: Date.now() + 2 }
             ],
             entusiasta: [
-                { id: crypto.randomUUID(), name: 'AMD Ryzen 7 7800X3D', category: 'CPU', watts: 120, price: 2700, createdAt: Date.now() },
+                { id: crypto.randomUUID(), name: 'AMD Ryzen 7 9800X3D', category: 'CPU', watts: 120, price: 2790, createdAt: Date.now() },
                 { id: crypto.randomUUID(), name: 'Gigabyte RTX 5070 Eagle', category: 'GPU', watts: 250, price: 4500, createdAt: Date.now() + 1 },
-                { id: crypto.randomUUID(), name: 'Corsair Vengeance 32GB DDR5', category: 'RAM', watts: 7, price: 890, createdAt: Date.now() + 2 },
-                { id: crypto.randomUUID(), name: 'SSD Kingston NV2 1TB M.2', category: 'STORAGE', watts: 4, price: 390, createdAt: Date.now() + 3 }
+                { id: crypto.randomUUID(), name: 'Corsair Vengeance 32GB DDR5 5600MHz', category: 'RAM', watts: 7, price: 890, createdAt: Date.now() + 2 }
             ]
         };
 
-        // ALTERAÇÃO CRÍTICA: Consumo direto do Dataset gerado pelo Actor no Apify
-        async function loadHardwareDatabase() {
-            try {
-                // Buscando a listagem do último Dataset público/privado do Actor rodado na sua conta
-                const response = await fetch(`https://api.apify.com/v2/acts/${ACTOR_ID}/runs/last/dataset/items?token=${API_TOKEN}`);
-                
-                if (!response.ok) throw new Error('Não foi possível conectar ao Dataset do Apify');
-                
-                const rawData = await response.json();
-                
-                // Formata os dados capturados do PCPartPicker para a estrutura compatível com a nossa aplicação
-                hardwareDB = rawData.map(item => ({
-                    name: item.name || item.title,
-                    category: determineCategory(item.category || item.type),
-                    watts: Number(item.tdp || item.watts || 0),
-                    price: Number(item.price || item.priceValue || 0)
-                })).filter(item => item.name); // Remove itens inválidos
-
-                console.log(`Sucesso: ${hardwareDB.length} componentes sincronizados da API do Apify.`);
-            } catch (error) {
-                console.warn('Erro ao carregar dados remotos da API. Ativando Fallback Local:', error);
-                // Banco de dados interno padrão para o sistema nunca falhar
-                hardwareDB = [
-                    { name: 'AMD Ryzen 7 7800X3D', category: 'CPU', watts: 120, price: 2700 },
-                    { name: 'AMD Ryzen 7 5700X', category: 'CPU', watts: 65, price: 1250 },
-                    { name: 'AMD Ryzen 5 5600', category: 'CPU', watts: 65, price: 850 },
-                    { name: 'Intel Core i5-14600K', category: 'CPU', watts: 125, price: 1950 },
-                    { name: 'Intel Core i7-14700K', category: 'CPU', watts: 125, price: 2800 },
-                    { name: 'Gigabyte RTX 5070 Eagle', category: 'GPU', watts: 250, price: 4500 },
-                    { name: 'NVIDIA RTX 4070 Super', category: 'GPU', watts: 220, price: 3900 },
-                    { name: 'NVIDIA RTX 4060 Ti', category: 'GPU', watts: 160, price: 2400 },
-                    { name: 'Cooler Master 850W 80 Plus Gold', category: 'PSU', watts: 0, price: 850 },
-                    { name: 'Corsair CX650 650W', category: 'PSU', watts: 0, price: 380 },
-                    { name: 'Kingston Fury Beast 16GB DDR4', category: 'RAM', watts: 5, price: 320 },
-                    { name: 'Corsair Vengeance 32GB DDR5', category: 'RAM', watts: 7, price: 890 },
-                    { name: 'SSD Kingston NV2 1TB M.2 NVMe', category: 'STORAGE', watts: 4, price: 390 }
-                ];
-            }
-        }
-
-        // Função utilitária para mapear categorias vindas do Scraper externo
-        function determineCategory(rawCategory) {
-            if (!rawCategory) return 'CPU';
-            const cat = rawCategory.toUpperCase();
-            if (cat.includes('PROCESSOR') || cat.includes('CPU')) return 'CPU';
-            if (cat.includes('VIDEO') || cat.includes('GPU') || cat.includes('CARD')) return 'GPU';
-            if (cat.includes('POWER') || cat.includes('PSU')) return 'PSU';
-            if (cat.includes('MOTHER') || cat.includes('BOARD')) return 'MOBO';
-            if (cat.includes('MEMORY') || cat.includes('RAM')) return 'RAM';
-            if (cat.includes('STORAGE') || cat.includes('SSD') || cat.includes('DRIVE')) return 'STORAGE';
-            return 'COOLER';
-        }
-
-        // Sistema de Auto-completar
+        // Algoritmo de Busca e Filtro do Auto-completar
         nameInput.addEventListener('input', () => {
             const query = nameInput.value.toLowerCase();
             suggestionsBox.innerHTML = '';
@@ -531,14 +497,14 @@
 
             if (matches.length > 0) {
                 suggestionsBox.style.display = 'block';
-                matches.slice(0, 10).forEach(match => { // Limita a 10 sugestões para melhor UI
+                matches.slice(0, 8).forEach(match => {
                     const li = document.createElement('li');
-                    li.textContent = match.name;
+                    li.textContent = `${match.name} (${match.category})`;
                     li.addEventListener('click', () => {
                         nameInput.value = match.name;
                         categoryInput.value = match.category;
-                        wattsInput.value = match.watts || 0;
-                        priceInput.value = match.price || 0;
+                        wattsInput.value = match.watts;
+                        priceInput.value = match.price;
                         suggestionsBox.style.display = 'none';
                     });
                     suggestionsBox.appendChild(li);
@@ -572,7 +538,7 @@
             const totals = components.reduce((acc, curr) => {
                 acc.watts += Number(curr.watts);
                 acc.price += Number(curr.price);
-                if(curr.category === 'GPU' && (curr.name.includes('40') || curr.name.includes('50'))) {
+                if(curr.category === 'GPU' && (curr.name.includes('40') || curr.name.includes('50') || curr.name.includes('7800'))) {
                     acc.hasHighEndGPU = true;
                 }
                 return acc;
@@ -596,14 +562,10 @@
                     budgetMessage.textContent = `Disponível: ${formatCurrency(budgetTarget - totals.price)}`;
                     budgetMessage.style.color = 'var(--primary-color)';
                 }
-            } else {
-                progressBar.style.width = '0%';
-                budgetStatus.textContent = 'Defina um orçamento alvo';
-                budgetMessage.textContent = '';
             }
 
-            if (totals.hasHighEndGPU && totals.watts > 350) {
-                compatAlert.innerHTML = `⚠️ <strong>Alerta de Compatibilidade:</strong> Você adicionou uma GPU de alta performance com consumo elevado de energia. Garanta que sua fonte seja de pelo menos <strong>750W ou 850W 80 Plus Gold</strong> para manter este setup estável sob carga total.`;
+            if (totals.hasHighEndGPU && totals.watts > 300) {
+                compatAlert.innerHTML = `⚠️ <strong>Alerta de Compatibilidade Elétrica:</strong> Setup com GPU de alto desempenho detectado. Recomenda-se o uso de uma fonte de alimentação com certificação mínima de <strong>750W ou 850W 80 Plus Gold</strong> para garantir estabilidade.`;
                 compatAlert.style.display = 'block';
             } else {
                 compatAlert.style.display = 'none';
@@ -640,45 +602,29 @@
         }
 
         window.loadPreset = function(type) {
-            if (components.length > 0 && !confirm('Deseja sobrescrever o seu setup atual com este preset?')) {
-                return;
-            }
+            if (components.length > 0 && !confirm('Deseja carregar este preset? Isso apagará a configuração atual da tela.')) return;
             components = presets[type].map(item => ({ ...item, id: crypto.randomUUID(), createdAt: Date.now() }));
             saveData();
             renderList();
         }
 
         window.exportSetup = function() {
-            if (components.length === 0) {
-                alert('Adicione componentes antes de exportar.');
-                return;
-            }
-            try {
-                const jsonStr = JSON.stringify(components);
-                const b64Code = btoa(encodeURIComponent(jsonStr));
-                prompt('Copie o código abaixo e envie para compartilhar o seu setup:', b64Code);
-            } catch (err) {
-                alert('Erro interno ao codificar dados da build.');
-            }
+            if (components.length === 0) return alert('Adicione peças antes de exportar.');
+            const jsonStr = JSON.stringify(components);
+            const b64Code = btoa(encodeURIComponent(jsonStr));
+            prompt('Copie o código do seu setup:', b64Code);
         }
 
         window.importSetup = function() {
-            const code = prompt('Cole o código do setup exportado aqui:');
+            const code = prompt('Cole o código do seu setup aqui:');
             if (!code) return;
             try {
                 const decodedJson = decodeURIComponent(atob(code.trim()));
-                const parsedArray = JSON.parse(decodedJson);
-                
-                if (Array.isArray(parsedArray)) {
-                    components = parsedArray;
-                    saveData();
-                    renderList();
-                    alert('Setup importado com sucesso!');
-                } else {
-                    throw new Error();
-                }
+                components = JSON.parse(decodedJson);
+                saveData();
+                renderList();
             } catch (err) {
-                alert('Código de compartilhamento inválido ou corrompido.');
+                alert('Código inválido.');
             }
         }
 
@@ -688,11 +634,6 @@
             const category = categoryInput.value;
             const watts = wattsInput.value;
             const price = priceInput.value;
-
-            if (!name || watts < 0 || price < 0) {
-                alert('Por favor, preencha os campos com valores válidos.');
-                return;
-            }
 
             components.push({
                 id: crypto.randomUUID(),
@@ -709,12 +650,7 @@
             nameInput.focus();
         });
 
-        async function init() {
-            renderList();
-            await loadHardwareDatabase();
-        }
-
-        init();
+        renderList();
     </script>
 </body>
 </html>
