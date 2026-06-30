@@ -1,10 +1,3 @@
-Para colocar a requisição da API do Apify diretamente no seu arquivo `index.html` (sem depender de um arquivo `hardware.json` externo), nós precisamos converter aquele comando `curl` do terminal em uma requisição `fetch` nativa do JavaScript.
-
-Como o robô do Apify leva alguns segundos para varrer o site externo e processar os dados a cada chamada, fazer isso a cada carregamento de página deixaria o seu site muito lento e estouraria o limite gratuito da sua chave rapidamente. A solução ideal para manter tudo reativo e em um único arquivo é fazer o `fetch` buscar **o último resultado gerado (Dataset)** pelo seu robô.
-
-Aqui está o código fonte completo, unificado no `index.html`, com o motor de busca adaptado para ler as informações direto da API do Apify usando a sua chave:
-
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
