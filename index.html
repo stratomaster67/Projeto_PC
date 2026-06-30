@@ -1,3 +1,10 @@
+Para colocar a requisição da API do Apify diretamente no seu arquivo `index.html` (sem depender de um arquivo `hardware.json` externo), nós precisamos converter aquele comando `curl` do terminal em uma requisição `fetch` nativa do JavaScript.
+
+Como o robô do Apify leva alguns segundos para varrer o site externo e processar os dados a cada chamada, fazer isso a cada carregamento de página deixaria o seu site muito lento e estouraria o limite gratuito da sua chave rapidamente. A solução ideal para manter tudo reativo e em um único arquivo é fazer o `fetch` buscar **o último resultado gerado (Dataset)** pelo seu robô.
+
+Aqui está o código fonte completo, unificado no `index.html`, com o motor de busca adaptado para ler as informações direto da API do Apify usando a sua chave:
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -47,7 +54,6 @@
             font-weight: 700;
         }
 
-        /* Presets Section */
         .presets-container {
             display: flex;
             gap: 0.5rem;
@@ -115,7 +121,6 @@
             margin-top: 0.5rem;
         }
 
-        /* Budget Progress Bar */
         .budget-container {
             background: var(--surface-color);
             padding: 1rem 1.5rem;
@@ -151,7 +156,6 @@
             background: var(--danger-color);
         }
 
-        /* Compatibility Alert */
         .alert-box {
             background: rgba(255, 165, 2, 0.1);
             border: 1px solid var(--warning-color);
@@ -258,7 +262,6 @@
             transform: translateY(-1px);
         }
 
-        /* Action Bar for Portability */
         .action-bar {
             display: flex;
             gap: 1rem;
@@ -423,12 +426,14 @@
     <script>
         const STORAGE_KEY = 'setup_manager_data';
         const BUDGET_KEY = 'setup_manager_budget';
+        
+        const API_TOKEN = 'apify_api_VrycVF31ZXSYpnJJ5uk3qYYoggtY5V2UhyD6';
+        const ACTOR_ID = 'matyascimbulka~pcpartpicker-scraper';
 
         let hardwareDB = []; 
         let components = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         let budgetTarget = Number(localStorage.getItem(BUDGET_KEY)) || 7000;
 
-        // DOM Elements
         const form = document.getElementById('setupForm');
         const listContainer = document.getElementById('componentList');
         const totalWattsEl = document.getElementById('totalWatts');
@@ -445,10 +450,8 @@
         const wattsInput = document.getElementById('watts');
         const priceInput = document.getElementById('price');
 
-        // Configuração inicial do input de orçamento
         budgetInput.value = budgetTarget;
 
-        // Templates de Presets Prontos
         const presets = {
             entrada: [
                 { id: crypto.randomUUID(), name: 'AMD Ryzen 5 5600', category: 'CPU', watts: 65, price: 850, createdAt: Date.now() },
@@ -472,12 +475,28 @@
             ]
         };
 
+        // ALTERAÇÃO CRÍTICA: Consumo direto do Dataset gerado pelo Actor no Apify
         async function loadHardwareDatabase() {
             try {
-                const response = await fetch('./hardware.json'); 
-                if (!response.ok) throw new Error('Arquivo não encontrado');
-                hardwareDB = await response.json();
+                // Buscando a listagem do último Dataset público/privado do Actor rodado na sua conta
+                const response = await fetch(`https://api.apify.com/v2/acts/${ACTOR_ID}/runs/last/dataset/items?token=${API_TOKEN}`);
+                
+                if (!response.ok) throw new Error('Não foi possível conectar ao Dataset do Apify');
+                
+                const rawData = await response.json();
+                
+                // Formata os dados capturados do PCPartPicker para a estrutura compatível com a nossa aplicação
+                hardwareDB = rawData.map(item => ({
+                    name: item.name || item.title,
+                    category: determineCategory(item.category || item.type),
+                    watts: Number(item.tdp || item.watts || 0),
+                    price: Number(item.price || item.priceValue || 0)
+                })).filter(item => item.name); // Remove itens inválidos
+
+                console.log(`Sucesso: ${hardwareDB.length} componentes sincronizados da API do Apify.`);
             } catch (error) {
+                console.warn('Erro ao carregar dados remotos da API. Ativando Fallback Local:', error);
+                // Banco de dados interno padrão para o sistema nunca falhar
                 hardwareDB = [
                     { name: 'AMD Ryzen 7 7800X3D', category: 'CPU', watts: 120, price: 2700 },
                     { name: 'AMD Ryzen 7 5700X', category: 'CPU', watts: 65, price: 1250 },
@@ -496,7 +515,20 @@
             }
         }
 
-        // Auto-completar
+        // Função utilitária para mapear categorias vindas do Scraper externo
+        function determineCategory(rawCategory) {
+            if (!rawCategory) return 'CPU';
+            const cat = rawCategory.toUpperCase();
+            if (cat.includes('PROCESSOR') || cat.includes('CPU')) return 'CPU';
+            if (cat.includes('VIDEO') || cat.includes('GPU') || cat.includes('CARD')) return 'GPU';
+            if (cat.includes('POWER') || cat.includes('PSU')) return 'PSU';
+            if (cat.includes('MOTHER') || cat.includes('BOARD')) return 'MOBO';
+            if (cat.includes('MEMORY') || cat.includes('RAM')) return 'RAM';
+            if (cat.includes('STORAGE') || cat.includes('SSD') || cat.includes('DRIVE')) return 'STORAGE';
+            return 'COOLER';
+        }
+
+        // Sistema de Auto-completar
         nameInput.addEventListener('input', () => {
             const query = nameInput.value.toLowerCase();
             suggestionsBox.innerHTML = '';
@@ -506,14 +538,14 @@
 
             if (matches.length > 0) {
                 suggestionsBox.style.display = 'block';
-                matches.forEach(match => {
+                matches.slice(0, 10).forEach(match => { // Limita a 10 sugestões para melhor UI
                     const li = document.createElement('li');
                     li.textContent = match.name;
                     li.addEventListener('click', () => {
                         nameInput.value = match.name;
                         categoryInput.value = match.category;
-                        wattsInput.value = match.watts;
-                        priceInput.value = match.price;
+                        wattsInput.value = match.watts || 0;
+                        priceInput.value = match.price || 0;
                         suggestionsBox.style.display = 'none';
                     });
                     suggestionsBox.appendChild(li);
@@ -529,7 +561,6 @@
             }
         });
 
-        // Escuta alteração do Orçamento Máximo
         budgetInput.addEventListener('input', () => {
             budgetTarget = Number(budgetInput.value) || 0;
             localStorage.setItem(BUDGET_KEY, budgetTarget);
@@ -544,7 +575,6 @@
             return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
         }
 
-        // Dashboard & Inteligência de Validação de Orçamento e Fonte
         function updateDashboard() {
             const totals = components.reduce((acc, curr) => {
                 acc.watts += Number(curr.watts);
@@ -558,7 +588,6 @@
             totalWattsEl.textContent = `${totals.watts} W`;
             totalPriceEl.textContent = formatCurrency(totals.price);
 
-            // 1. Regra de Negócio: Gestão do Orçamento Alvo
             if (budgetTarget > 0) {
                 const percent = Math.min((totals.price / budgetTarget) * 100, 100);
                 progressBar.style.width = `${percent}%`;
@@ -580,7 +609,6 @@
                 budgetMessage.textContent = '';
             }
 
-            // 3. Regra de Negócio: Alerta Dinâmico de Compatibilidade Elétrica
             if (totals.hasHighEndGPU && totals.watts > 350) {
                 compatAlert.innerHTML = `⚠️ <strong>Alerta de Compatibilidade:</strong> Você adicionou uma GPU de alta performance com consumo elevado de energia. Garanta que sua fonte seja de pelo menos <strong>750W ou 850W 80 Plus Gold</strong> para manter este setup estável sob carga total.`;
                 compatAlert.style.display = 'block';
@@ -618,18 +646,15 @@
             renderList();
         }
 
-        // 4. Regra de Negócio: Presets Rápidos (Injeção de Estado Mocado)
         window.loadPreset = function(type) {
             if (components.length > 0 && !confirm('Deseja sobrescrever o seu setup atual com este preset?')) {
                 return;
             }
-            // Clona profundamente os objetos do preset gerando novos IDs estáveis
             components = presets[type].map(item => ({ ...item, id: crypto.randomUUID(), createdAt: Date.now() }));
             saveData();
             renderList();
         }
 
-        // 2. Regra de Negócio: Exportar/Importar via serialização Base64 (Portabilidade sem Backend)
         window.exportSetup = function() {
             if (components.length === 0) {
                 alert('Adicione componentes antes de exportar.');
@@ -638,9 +663,7 @@
             try {
                 const jsonStr = JSON.stringify(components);
                 const b64Code = btoa(encodeURIComponent(jsonStr));
-                
-                // Exibe prompt nativo permitindo cópia rápida pelo usuário
-                prompt('Copia o código abaixo e envie para compartilhar o seu setup:', b64Code);
+                prompt('Copie o código abaixo e envie para compartilhar o seu setup:', b64Code);
             } catch (err) {
                 alert('Erro interno ao codificar dados da build.');
             }
